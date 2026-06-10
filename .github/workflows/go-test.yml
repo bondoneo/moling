@@ -2,9 +2,7 @@ name: Golang CI and Test
 
 on:
   push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 jobs:
   build-on-ubuntu2204:
@@ -17,6 +15,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v5
         with:
+          cache: 'true'
           go-version: '1.24.1'
       - uses: actions/checkout@v4
         with:
@@ -32,7 +31,7 @@ jobs:
         run: |
           make clean
           TARGET_OS=${{ matrix.os }} TARGET_ARCH=${{ matrix.arch }} make env
-          TARGET_OS=${{ matrix.os }} TARGET_ARCH=${{ matrix.arch }} make test
+          TARGET_OS=${{ matrix.os }} TARGET_ARCH=${{ matrix.arch }} CGO_ENABLED=1 go test -v -race ./client ./pkg/config ./pkg/server
       - name: MoLing Build
         run: |
           make clean
